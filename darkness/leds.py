@@ -1,5 +1,4 @@
 import math
-from rpi_ws281x import Adafruit_NeoPixel
 
 
 # Changes HSV list [360, 0.5, 0.5] into RGB list [127, 63, 63].
@@ -26,10 +25,33 @@ def hsv_to_rgb(hsv):
     return [int(r * 255), int(g * 255), int(b * 255)]
 
 
-## TODO: Add configuration options.
+# Used for functional testing on amd64 machines without GPIO.
+class Mock_Adafruit_NeoPixel():
+    def __init__(self, leds, port):
+        self.leds = leds
+
+    def begin(self):
+        print("WARNING: Couldn't find rpi_ws281x library! Entering dry_run mode.")
+
+    def numPixels(self):
+        return self.leds
+
+    def setPixelColorRGB(self, led, r, g, b):
+        print("LED: {} -> RGB: {}/{}/{}".format(str(led).zfill(2), r, g, b))
+
+    def show(self):
+        print("DEBUG: Strip state was updated!")
+
+
+# TODO: Add configuration options.
 class StripController():
     def __init__(self):
-        self.strip = Adafruit_NeoPixel(16, 18)
+        try:
+            from rpi_ws281x import Adafruit_NeoPixel
+            self.strip = Adafruit_NeoPixel(16, 18)
+
+        except:
+            self.strip = Mock_Adafruit_NeoPixel(16, 18)
 
         self.hsv = [0, 0, 0]
         self._status = True
@@ -38,7 +60,6 @@ class StripController():
         # On start changes values to black.
         self.strip.begin()
         self.set_color(self.hsv)
-
 
     def set_color(self, hsv, id=None, save_state=True):
         rgb = hsv_to_rgb(hsv)
@@ -58,7 +79,6 @@ class StripController():
         # Saves color as currently displayed.
         if save_state:
             self.hsv = hsv
-
 
     @property
     def status(self):
