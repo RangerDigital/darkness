@@ -106,7 +106,6 @@ def show_blink():
             strip.set_color([hue, 1, 1 / value], save_state=False)
 
         time.sleep(0.3)
-
         for value in range(1, 10):
             time.sleep(0.01)
             strip.set_color([hue, 1, 1 / value], save_state=False)

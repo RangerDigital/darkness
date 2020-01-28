@@ -20,7 +20,7 @@ jobs:
         version: latest
 
     - name: Set up py.test
-      run: pip install pytest requests
+      run: pip3 install pytest requests
 
     - name: Run Buildx for testing
       run: docker buildx build --tag rangerdigital/darkness:dev --platform linux/amd64 --output type=docker .
@@ -29,7 +29,7 @@ jobs:
       run: docker run --name darkness -p 127.0.0.1:5000:8000 -d rangerdigital/darkness:dev
 
     - name: Run all the tests
-      run: sleep 5; python -m pytest
+      run: sleep 5; python3 -m pytest
 
     - name: Login to DockerHub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
