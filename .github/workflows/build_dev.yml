@@ -28,6 +28,9 @@ jobs:
     - name: Run Darkness container for testing
       run: docker run --name darkness --privileged -p 127.0.0.1:5000:8000 -d rangerdigital/darkness:dev
 
+    - name: DEBUG: Get logs from failing container
+      run: docker logs darkness
+
     - name: Run all the tests
       run: sleep 5; python -m pytest
 
