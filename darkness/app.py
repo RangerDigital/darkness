@@ -123,5 +123,10 @@ def show_blink():
     return jsonify({"msg": "Blink animation completed!"})
 
 
+@app.errorhandler(404)
+def not_found():
+    return jsonify({"error": "Endpoint with that URL doesn't exist!"}), 404
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
