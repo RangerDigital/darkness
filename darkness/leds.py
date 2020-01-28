@@ -48,17 +48,18 @@ class StripController():
     def __init__(self):
         try:
             from rpi_ws281x import Adafruit_NeoPixel
-            self.strip = Adafruit_NeoPixel(16, 18)
 
+            self.strip = Adafruit_NeoPixel(16, 18)
+            self.strip.begin()
         except:
             self.strip = Mock_Adafruit_NeoPixel(16, 18)
+            self.strip.begin()
 
         self.hsv = [0, 0, 0]
         self._status = True
         self.event_running = False
 
         # On start changes values to black.
-        self.strip.begin()
         self.set_color(self.hsv)
 
     def set_color(self, hsv, id=None, save_state=True):

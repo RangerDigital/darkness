@@ -9,7 +9,8 @@ RUN pip3 install flask
 RUN pip3 install rpi-ws281x
 
 # Copy files.
-COPY darkness/* /
+COPY darkness/app.py /
+COPY darkness/leds.py /
 
 # Run app server.
 CMD gunicorn3 -b 0.0.0.0:8000 app:app
