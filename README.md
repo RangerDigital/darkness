@@ -1,7 +1,7 @@
 <p align="center">
   <br /><img
     width="400"
-    src="https://raw.githubusercontent.com/rangerdigital/darkness/master/logo.png"
+    src="logo.png"
     alt="Darkness – NeoPixels Controller"
   />
 </p>
