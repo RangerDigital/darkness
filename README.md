@@ -1,4 +1,11 @@
-# Darkness
+<p align="center">
+  <br /><img
+    width="400"
+    src="https://raw.githubusercontent.com/rangerdigital/darkness/master/logo.png"
+    alt="Darkness – NeoPixels Controller"
+  />
+</p>
+
 ![Build - Production](https://github.com/RangerDigital/darkness/workflows/Build%20-%20Production/badge.svg?branch=master)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
