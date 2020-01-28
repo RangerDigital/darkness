@@ -28,9 +28,6 @@ jobs:
     - name: Run Darkness container for testing
       run: docker run --name darkness -p 127.0.0.1:5000:8000 -d rangerdigital/darkness:dev
 
-    - name: DEBUG Setup Tmate session
-      uses: mxschmitt/action-tmate@v1
-
     - name: Run all the tests
       run: sleep 5; python -m pytest
 
