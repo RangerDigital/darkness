@@ -1,4 +1,13 @@
-# Darkness
+<p align="center">
+  <br /><img
+    width="600"
+    src="logo.png"
+    alt="Darkness – NeoPixels Controller"
+  />
+</p>
+
+***
+
 ![Build - Dev](https://github.com/RangerDigital/darkness/workflows/Build%20-%20Dev/badge.svg?branch=dev)
 ![Build - Production](https://github.com/RangerDigital/darkness/workflows/Build%20-%20Production/badge.svg?branch=master)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -24,7 +33,7 @@ docker run --name darkness --privileged -p 5001:8000 rangerdigital/darkness
 ```
 
 >The privileged flag is seriously **insecure**, I wouldn't trust me if I were you!
->
+
 ## Usage
 
 **Darkness** is currently in the **development stage** so the whole documentation is incomplete.
@@ -41,6 +50,11 @@ with **POST** or **PUT** you can update these values to control still ambient li
 }
 ```
 You can control NeoPixels with these **HSV** values!
+
+## Testing
+
+You can run basic py.test **functional tests** inside the **/tests** directory.
+You can specify URL of the running app inside py.test fixture.
 
 ## License
 [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/)
