@@ -62,6 +62,16 @@ class StripController():
         # On start changes values to black.
         self.set_color(self.hsv)
 
+    def get_state(self):
+        state = {"hue": self.hsv[0], "saturation": self.hsv[1],
+                 "value": self.hsv[2], "status": self.status}
+
+        return state
+
+    def set_state(self, state):
+        self.hsv = [state["hue"], state["saturation"], state["value"]]
+        self.status = state["status"]
+
     def set_color(self, hsv, id=None, save_state=True):
         rgb = hsv_to_rgb(hsv)
 

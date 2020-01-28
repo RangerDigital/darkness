@@ -11,41 +11,30 @@ strip = StripController()
 
 
 class StateSchema(Schema):
-    hue = fields.Int(validate=Range(
-        min=0, max=360))
-    saturation = fields.Float(validate=Range(
-        min=0, max=1))
-    value = fields.Float(validate=Range(
-        min=0, max=1))
+    hue = fields.Int(validate=Range(min=0, max=360))
+    value = fields.Float(validate=Range(min=0, max=1))
+    saturation = fields.Float(validate=Range(min=0, max=1))
     status = fields.Bool()
 
 
 class AnimationParamsSchema(Schema):
-    hue = fields.Int(missing=360, validate=Range(
-        min=0, max=360))
-    duration = fields.Int(missing=1, validate=Range(
-        min=1, max=60))
-    count = fields.Int(missing=1, validate=Range(
-        min=1, max=60))
+    hue = fields.Int(missing=360, validate=Range(min=0, max=360))
+    count = fields.Int(missing=1, validate=Range(min=1, max=60))
+    duration = fields.Int(missing=1, validate=Range(min=1, max=60))
 
 
 @app.route("/state", methods=["GET"])
 def get_state():
-    hue, saturation, value = strip.hsv
+    state = strip.get_state()
 
-    response = {"hue": hue, "saturation": saturation,
-                "value": value, "status": strip.status}
-
-    return jsonify(response)
+    return jsonify(state)
 
 
 @app.route("/state", methods=["PUT", "POST"])
 def update_state():
     payload = request.get_json(force=True)
 
-    # Get current state dictionary. Updates changed values.
-    state = {"hue": strip.hsv[0], "saturation": strip.hsv[1],
-             "value": strip.hsv[2], "status": strip.status}
+    state = strip.get_state()
 
     result = StateSchema().load(payload)
     if result.errors:
@@ -54,19 +43,18 @@ def update_state():
         payload = result.data
 
     state.update(payload)
-
-    # Update strip with new state.
-    strip.status = state["status"]
-    strip.set_color([state["hue"], state["saturation"], state["value"]])
+    strip.set_state(state)
 
     return jsonify(state)
 
-# TODO: Refactor all validation and structure for animations!
 
+# TODO: Refactor all validation and structure for animations!
 # Rainbow animation.
 @app.route("/animations/rainbow", methods=["PUT", "POST"])
 def show_rainbow():
-    result = AnimationParamsSchema().load(request.args)
+    args = request.args
+
+    result = AnimationParamsSchema().load(args)
     if result.errors:
         return jsonify({"error": result.errors}), 400
     else:
@@ -77,16 +65,13 @@ def show_rainbow():
 
     strip.event_running = True
 
-    state_hsv = strip.hsv
-    state_status = strip.status
+    state = strip.get_state()
 
     for hue in range(0, 360):
         time.sleep(duration / 360)
         strip.set_color([hue, 1, 1], save_state=False)
 
-    # Restore state before animation.
-    strip.status = state_status
-    strip.set_color(state_hsv)
+    strip.set_state(state)
 
     strip.event_running = False
 
@@ -96,7 +81,9 @@ def show_rainbow():
 # Rainbow animation.
 @app.route("/animations/blink", methods=["PUT", "POST"])
 def show_blink():
-    result = AnimationParamsSchema().load(request.args)
+    args = request.args
+
+    result = AnimationParamsSchema().load(args)
     if result.errors:
         return jsonify({"error": result.errors}), 400
     else:
@@ -108,11 +95,9 @@ def show_blink():
 
     strip.event_running = True
 
-    state_hsv = strip.hsv
-    state_status = strip.status
+    state = strip.get_state()
 
     for i in range(count):
-
         for value in range(10, 0, -1):
             time.sleep(0.01)
             strip.set_color([hue, 1, 1 / value], save_state=False)
@@ -126,9 +111,7 @@ def show_blink():
         strip.set_color([0, 0, 0], save_state=False)
         time.sleep(0.3)
 
-    # Restore state before animation.
-    strip.status = state_status
-    strip.set_color(state_hsv)
+    strip.set_state(state)
 
     strip.event_running = False
 

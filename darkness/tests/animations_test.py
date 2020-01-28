@@ -3,9 +3,17 @@ import requests
 
 
 def test_rainbow(URL):
+    response = requests.get(URL + "/state")
+    old_state = response.json()
+
     response = requests.post(URL + "/animations/rainbow")
 
     assert response.status_code == 200
+
+    response = requests.get(URL + "/state")
+    new_state = response.json()
+
+    assert old_state == new_state
 
 
 def test_rainbow_params(URL):
