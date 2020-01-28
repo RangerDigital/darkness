@@ -1,9 +1,9 @@
-name: Build - Production
+name: Build - Dev
 
 on:
   push:
     branches:
-    - master
+    - dev
     paths:
     - "darkness/**"
 
@@ -19,8 +19,20 @@ jobs:
       with:
         version: latest
 
+    - name: Set up py.test
+      run: pip install pytest
+
+    - name: Run Buildx for testing
+      run: docker buildx build --tag rangerdigital/darkness --platform linux/amd64 --output type=docker .
+
+    - name: Run Darkness container for testing
+      run: docker run --name darkness --privileged -p 5000:8000 -d rangerdigital/darkness
+
+    - name: Run all the tests
+      run: pytest
+
     - name: Login to DockerHub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Run Buildx
+    - name: Run Buildx with all platforms
       run: docker buildx build --tag rangerdigital/darkness --platform linux/amd64,linux/arm64,linux/arm/v7 --output type=registry .
