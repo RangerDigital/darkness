@@ -31,6 +31,10 @@ jobs:
     - name: Run all the tests
       run: sleep 5; python3 -m pytest
 
+    - name: Setup Tmate session
+      uses: mxschmitt/action-tmate@v1
+      if: failure()
+
     - name: Login to DockerHub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
