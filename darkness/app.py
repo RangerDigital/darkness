@@ -1,10 +1,32 @@
 #!/usr/bin/env python3
 import time
+
+from marshmallow import Schema, fields
+from marshmallow.validate import Range
 from flask import Flask, jsonify, request
 from leds import StripController
 
 app = Flask(__name__)
 strip = StripController()
+
+
+class StateSchema(Schema):
+    hue = fields.Int(validate=Range(
+        min=0, max=360))
+    saturation = fields.Float(validate=Range(
+        min=0, max=1))
+    value = fields.Float(validate=Range(
+        min=0, max=1))
+    status = fields.Bool()
+
+
+class AnimationParamsSchema(Schema):
+    hue = fields.Int(missing=360, validate=Range(
+        min=0, max=360))
+    duration = fields.Int(missing=1, validate=Range(
+        min=1, max=60))
+    count = fields.Int(missing=1, validate=Range(
+        min=1, max=60))
 
 
 @app.route("/state", methods=["GET"])
@@ -13,31 +35,25 @@ def get_state():
 
     response = {"hue": hue, "saturation": saturation,
                 "value": value, "status": strip.status}
+
     return jsonify(response)
 
 
 @app.route("/state", methods=["PUT", "POST"])
 def update_state():
-    payload = request.json or {}
+    payload = request.get_json(force=True)
 
     # Get current state dictionary. Updates changed values.
     state = {"hue": strip.hsv[0], "saturation": strip.hsv[1],
              "value": strip.hsv[2], "status": strip.status}
+
+    result = StateSchema().load(payload)
+    if result.errors:
+        return jsonify({"error": result.errors}), 400
+    else:
+        payload = result.data
+
     state.update(payload)
-
-    # Validate payload, No Pydantic because of old Python :C
-    # TODO: Find a better way to validate inputs, maybe upgrade Python?
-    if not isinstance(state["hue"], int) or state["hue"] > 360 or state["hue"] < 0:
-        return jsonify({"error": "Hue must be a value between 0 and 360!"}), 400
-
-    if not (isinstance(state["saturation"], int) or isinstance(state["saturation"], float)) or state["saturation"] > 1 or state["saturation"] < 0:
-        return jsonify({"error": "Saturation must be a value between 0 and 1!"}), 400
-
-    if not (isinstance(state["value"], int) or isinstance(state["value"], float)) or state["value"] > 1 or state["value"] < 0:
-        return jsonify({"error": "Value must be a value between 0 and 1!"}), 400
-
-    if type(state["status"]) != type(True):
-        return jsonify({"error": "Status must be a boolean value!"}), 400
 
     # Update strip with new state.
     strip.status = state["status"]
@@ -50,16 +66,14 @@ def update_state():
 # Rainbow animation.
 @app.route("/animations/rainbow", methods=["PUT", "POST"])
 def show_rainbow():
-    duration = float(request.args.get("duration") or 1)
+    result = AnimationParamsSchema().load(request.args)
+    if result.errors:
+        return jsonify({"error": result.errors}), 400
+    else:
+        duration = result.data["duration"]
 
     if strip.event_running:
-        return jsonify({"error": "Animation is currently running!"}), 400
-
-    if duration == 0 or duration > 60:
-        return jsonify({"error": "You don't want to do that!"}), 400
-
-    if duration <= 0 or duration > 60:
-        return jsonify({"error": "Duration must be a value between 0 and 60!"}), 400
+        return jsonify({"error": "Another animation is currently running!"}), 400
 
     strip.event_running = True
 
@@ -82,17 +96,15 @@ def show_rainbow():
 # Rainbow animation.
 @app.route("/animations/blink", methods=["PUT", "POST"])
 def show_blink():
-    count = int(request.args.get("count") or 1)
-    hue = int(request.args.get("hue") or 360)
+    result = AnimationParamsSchema().load(request.args)
+    if result.errors:
+        return jsonify({"error": result.errors}), 400
+    else:
+        count = result.data["count"]
+        hue = result.data["hue"]
 
     if strip.event_running:
         return jsonify({"error": "Animation is currently running!"}), 400
-
-    if hue > 360 or hue < 0:
-        return jsonify({"error": "Hue must be a value between 0 and 360!"}), 400
-
-    if count == 0 or count > 60:
-        return jsonify({"error": "Count must be a value between 0 and 60!"}), 400
 
     strip.event_running = True
 
@@ -123,9 +135,15 @@ def show_blink():
     return jsonify({"msg": "Blink animation completed!"})
 
 
+# Custom error messages.
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({"error": "Endpoint with that URL doesn't exist!"}), 404
+
+# TODO: Add more info about error.
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({"error": "JSON payload is invalid!"}), 400
 
 
 if __name__ == "__main__":

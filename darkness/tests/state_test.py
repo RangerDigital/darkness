@@ -15,18 +15,19 @@ def test_get(URL):
 
 def test_post(URL):
     # Check if you can update state with some correct values.
-    payload = {"hue": 35, "saturation": 0.5}
+    payloads = [{"hue": 35, "saturation": 0.5}, {},
+                {"saturation": 0}, {"value": 1}]
 
-    response = requests.post(URL + "/state", json=payload)
-    json = response.json()
+    for payload in payloads:
+        response = requests.post(URL + "/state", json=payload)
+        json = response.json()
 
-    assert response.status_code == 200
-    assert response.headers["Content-Type"] == "application/json"
+        assert response.status_code == 200
+        assert response.headers["Content-Type"] == "application/json"
 
-    assert json["hue"] == payload["hue"]
-    assert json["saturation"] == payload["saturation"]
+        assert json["hue"] == 35
 
-    assert set(("status", "hue", "saturation", "value")) <= set(json)
+        assert set(("status", "hue", "saturation", "value")) <= set(json)
 
 
 def test_invalid_values_post(URL):
@@ -46,3 +47,13 @@ def test_invalid_types_post(URL):
     for payload in payloads:
         response = requests.post(URL + "/state", json=payload)
         assert response.status_code == 400
+
+
+def test_invalid_json_post(URL):
+    payload = "{'This will be fun!'}, Hello!"
+
+    response = requests.post(URL + "/state", data=payload)
+    json = response.json()
+
+    assert response.status_code == 400
+    assert json["error"] == "JSON payload is invalid!"
