@@ -2,7 +2,7 @@
 import time
 from functools import wraps
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, ValidationError
 from marshmallow.validate import Range
 
 from flask import Flask, jsonify, request
@@ -37,11 +37,11 @@ def update_state():
     payload = request.get_json(force=True)
     state = strip.get_state()
 
-    result = StateSchema().load(payload)
-    if result.errors:
-        return jsonify({"error": result.errors}), 400
-    else:
-        payload = result.data
+    try:
+        payload = StateSchema().load(payload)
+
+    except ValidationError as error:
+        return jsonify({"error": error.messages}), 400
 
     state.update(payload)
     strip.set_state(state)
@@ -74,11 +74,12 @@ def animation(function):
 def show_rainbow():
     args = request.args
 
-    result = AnimationParamsSchema().load(args)
-    if result.errors:
-        return jsonify({"error": result.errors}), 400
-    else:
-        duration = result.data["duration"]
+    try:
+        results = AnimationParamsSchema().load(args)
+        duration = results["duration"]
+
+    except ValidationError as error:
+        return jsonify({"error": error.messages}), 400
 
     for hue in range(0, 360):
         time.sleep(duration / 360)
@@ -93,12 +94,13 @@ def show_rainbow():
 def show_blink():
     args = request.args
 
-    result = AnimationParamsSchema().load(args)
-    if result.errors:
-        return jsonify({"error": result.errors}), 400
-    else:
-        count = result.data["count"]
-        hue = result.data["hue"]
+    try:
+        results = AnimationParamsSchema().load(args)
+        count = results["count"]
+        hue = results["hue"]
+
+    except ValidationError as error:
+        return jsonify({"error": error.messages}), 400
 
     for i in range(count):
         for value in range(10, 0, -1):
