@@ -20,13 +20,13 @@ jobs:
         version: latest
 
     - name: Set up py.test
-      run: pip install pytest
+      run: pip install pytest requests
 
     - name: Run Buildx for testing
-      run: docker buildx build --tag rangerdigital/darkness --platform linux/amd64 --output type=docker .
+      run: docker buildx build --tag rangerdigital/darkness:dev --platform linux/amd64 --output type=docker .
 
     - name: Run Darkness container for testing
-      run: docker run --name darkness --privileged -p 5000:8000 -d rangerdigital/darkness
+      run: docker run --name darkness --privileged -p 5000:8000 -d rangerdigital/darkness:dev
 
     - name: Run all the tests
       run: python -m pytest
@@ -35,4 +35,4 @@ jobs:
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Run Buildx with all platforms
-      run: docker buildx build --tag rangerdigital/darkness --platform linux/amd64,linux/arm64,linux/arm/v7 --output type=registry .
+      run: docker buildx build --tag rangerdigital/darkness:dev --platform linux/amd64,linux/arm64,linux/arm/v7 --output type=registry .

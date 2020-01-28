@@ -10,3 +10,5 @@ def test_not_found(URL):
     assert response.status_code == 404
     assert response.headers["Content-Type"] == "application/json"
     assert json["error"] == "Endpoint with that URL doesn't exist!"
+
+# Other stuff.
