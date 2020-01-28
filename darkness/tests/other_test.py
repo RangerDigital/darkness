@@ -9,6 +9,14 @@ def test_not_found(URL):
 
     assert response.status_code == 404
     assert response.headers["Content-Type"] == "application/json"
-    assert json["error"] == "Endpoint with that URL doesn't exist!"
+    assert json["error"]
 
-# I need to change this file to run tests
+
+def test_invalid_method(URL):
+    # Check if custom 405 is working.
+    response = requests.get(URL + "/animations/blink")
+    json = response.json()
+
+    assert response.status_code == 405
+    assert response.headers["Content-Type"] == "application/json"
+    assert json["error"]

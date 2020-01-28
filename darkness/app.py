@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import time
+from functools import wraps
 
 from marshmallow import Schema, fields
 from marshmallow.validate import Range
+
 from flask import Flask, jsonify, request
 from leds import StripController
 
@@ -33,7 +35,6 @@ def get_state():
 @app.route("/state", methods=["PUT", "POST"])
 def update_state():
     payload = request.get_json(force=True)
-
     state = strip.get_state()
 
     result = StateSchema().load(payload)
@@ -48,9 +49,28 @@ def update_state():
     return jsonify(state)
 
 
-# TODO: Refactor all validation and structure for animations!
+# Decorator for wrapping animations, Restores state and sets event_running flag.
+def animation(function):
+    @wraps(function)
+    def decorated_func(*args, **kwargs):
+        if strip.event_running:
+            return jsonify({"error": "Animation is currently running!"}), 400
+
+        strip.event_running = True
+
+        state = strip.get_state()
+        values = function(*args, **kwargs)
+        strip.set_state(state)
+
+        strip.event_running = False
+        return values
+
+    return decorated_func
+
+
 # Rainbow animation.
 @app.route("/animations/rainbow", methods=["PUT", "POST"])
+@animation
 def show_rainbow():
     args = request.args
 
@@ -60,26 +80,16 @@ def show_rainbow():
     else:
         duration = result.data["duration"]
 
-    if strip.event_running:
-        return jsonify({"error": "Another animation is currently running!"}), 400
-
-    strip.event_running = True
-
-    state = strip.get_state()
-
     for hue in range(0, 360):
         time.sleep(duration / 360)
         strip.set_color([hue, 1, 1], save_state=False)
 
-    strip.set_state(state)
-
-    strip.event_running = False
-
     return jsonify({"msg": "Rainbow animation completed!"})
 
 
-# Rainbow animation.
+# Blink animation.
 @app.route("/animations/blink", methods=["PUT", "POST"])
+@animation
 def show_blink():
     args = request.args
 
@@ -89,13 +99,6 @@ def show_blink():
     else:
         count = result.data["count"]
         hue = result.data["hue"]
-
-    if strip.event_running:
-        return jsonify({"error": "Animation is currently running!"}), 400
-
-    strip.event_running = True
-
-    state = strip.get_state()
 
     for i in range(count):
         for value in range(10, 0, -1):
@@ -111,22 +114,14 @@ def show_blink():
         strip.set_color([0, 0, 0], save_state=False)
         time.sleep(0.3)
 
-    strip.set_state(state)
-
-    strip.event_running = False
-
     return jsonify({"msg": "Blink animation completed!"})
 
 
-# Custom error messages.
 @app.errorhandler(404)
-def not_found(error):
-    return jsonify({"error": "Endpoint with that URL doesn't exist!"}), 404
-
-# TODO: Add more info about error.
 @app.errorhandler(400)
-def bad_request(error):
-    return jsonify({"error": "JSON payload is invalid!"}), 400
+@app.errorhandler(405)
+def error_handler(error):
+    return jsonify({"error": error.description}), error.code
 
 
 if __name__ == "__main__":

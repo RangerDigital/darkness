@@ -56,4 +56,4 @@ def test_invalid_json_post(URL):
     json = response.json()
 
     assert response.status_code == 400
-    assert json["error"] == "JSON payload is invalid!"
+    assert json["error"]
