@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 import time
+from functools import wraps
+
+from marshmallow import Schema, fields, ValidationError
+from marshmallow.validate import Range
+
 from flask import Flask, jsonify, request
 from leds import StripController
 
@@ -7,106 +12,102 @@ app = Flask(__name__)
 strip = StripController()
 
 
+class StateSchema(Schema):
+    hue = fields.Int(validate=Range(min=0, max=360))
+    value = fields.Float(validate=Range(min=0, max=1))
+    saturation = fields.Float(validate=Range(min=0, max=1))
+    status = fields.Bool()
+
+
+class AnimationParamsSchema(Schema):
+    hue = fields.Int(missing=360, validate=Range(min=0, max=360))
+    count = fields.Int(missing=1, validate=Range(min=1, max=60))
+    duration = fields.Int(missing=1, validate=Range(min=1, max=60))
+
+
 @app.route("/state", methods=["GET"])
 def get_state():
-    hue, saturation, value = strip.hsv
+    state = strip.get_state()
 
-    response = {"hue": hue, "saturation": saturation,
-                "value": value, "status": strip.status}
-    return jsonify(response)
+    return jsonify(state)
 
 
 @app.route("/state", methods=["PUT", "POST"])
 def update_state():
-    payload = request.json or {}
+    payload = request.get_json(force=True)
+    state = strip.get_state()
 
-    # Get current state dictionary. Updates changed values.
-    state = {"hue": strip.hsv[0], "saturation": strip.hsv[1],
-             "value": strip.hsv[2], "status": strip.status}
+    try:
+        payload = StateSchema().load(payload)
+
+    except ValidationError as error:
+        return jsonify({"error": error.messages}), 400
+
     state.update(payload)
-
-    # Validate payload, No Pydantic because of old Python :C
-    # TODO: Find a better way to validate inputs, maybe upgrade Python?
-    if not isinstance(state["hue"], int) or state["hue"] > 360 or state["hue"] < 0:
-        return jsonify({"error": "Hue must be a value between 0 and 360!"}), 400
-
-    if not (isinstance(state["saturation"], int) or isinstance(state["saturation"], float)) or state["saturation"] > 1 or state["saturation"] < 0:
-        return jsonify({"error": "Saturation must be a value between 0 and 1!"}), 400
-
-    if not (isinstance(state["value"], int) or isinstance(state["value"], float)) or state["value"] > 1 or state["value"] < 0:
-        return jsonify({"error": "Value must be a value between 0 and 1!"}), 400
-
-    if type(state["status"]) != type(True):
-        return jsonify({"error": "Status must be a boolean value!"}), 400
-
-    # Update strip with new state.
-    strip.status = state["status"]
-    strip.set_color([state["hue"], state["saturation"], state["value"]])
+    strip.set_state(state)
 
     return jsonify(state)
 
-# TODO: Refactor all validation and structure for animations!
+
+# Decorator for wrapping animations, Restores state and sets event_running flag.
+def animation(function):
+    @wraps(function)
+    def decorated_func(*args, **kwargs):
+        if strip.event_running:
+            return jsonify({"error": "Animation is currently running!"}), 400
+
+        strip.event_running = True
+
+        state = strip.get_state()
+        values = function(*args, **kwargs)
+        strip.set_state(state)
+
+        strip.event_running = False
+        return values
+
+    return decorated_func
+
 
 # Rainbow animation.
 @app.route("/animations/rainbow", methods=["PUT", "POST"])
+@animation
 def show_rainbow():
-    duration = float(request.args.get("duration") or 1)
+    args = request.args
 
-    if strip.event_running:
-        return jsonify({"error": "Animation is currently running!"}), 400
+    try:
+        results = AnimationParamsSchema().load(args)
+        duration = results["duration"]
 
-    if duration == 0 or duration > 60:
-        return jsonify({"error": "You don't want to do that!"}), 400
-
-    if duration <= 0 or duration > 60:
-        return jsonify({"error": "Duration must be a value between 0 and 60!"}), 400
-
-    strip.event_running = True
-
-    state_hsv = strip.hsv
-    state_status = strip.status
+    except ValidationError as error:
+        return jsonify({"error": error.messages}), 400
 
     for hue in range(0, 360):
         time.sleep(duration / 360)
         strip.set_color([hue, 1, 1], save_state=False)
 
-    # Restore state before animation.
-    strip.status = state_status
-    strip.set_color(state_hsv)
-
-    strip.event_running = False
-
     return jsonify({"msg": "Rainbow animation completed!"})
 
 
-# Rainbow animation.
+# Blink animation.
 @app.route("/animations/blink", methods=["PUT", "POST"])
+@animation
 def show_blink():
-    count = int(request.args.get("count") or 1)
-    hue = int(request.args.get("hue") or 360)
+    args = request.args
 
-    if strip.event_running:
-        return jsonify({"error": "Animation is currently running!"}), 400
+    try:
+        results = AnimationParamsSchema().load(args)
+        count = results["count"]
+        hue = results["hue"]
 
-    if hue > 360 or hue < 0:
-        return jsonify({"error": "Hue must be a value between 0 and 360!"}), 400
-
-    if count == 0 or count > 60:
-        return jsonify({"error": "Count must be a value between 0 and 60!"}), 400
-
-    strip.event_running = True
-
-    state_hsv = strip.hsv
-    state_status = strip.status
+    except ValidationError as error:
+        return jsonify({"error": error.messages}), 400
 
     for i in range(count):
-
         for value in range(10, 0, -1):
             time.sleep(0.01)
             strip.set_color([hue, 1, 1 / value], save_state=False)
 
         time.sleep(0.3)
-
         for value in range(1, 10):
             time.sleep(0.01)
             strip.set_color([hue, 1, 1 / value], save_state=False)
@@ -114,18 +115,14 @@ def show_blink():
         strip.set_color([0, 0, 0], save_state=False)
         time.sleep(0.3)
 
-    # Restore state before animation.
-    strip.status = state_status
-    strip.set_color(state_hsv)
-
-    strip.event_running = False
-
     return jsonify({"msg": "Blink animation completed!"})
 
 
 @app.errorhandler(404)
-def not_found(error):
-    return jsonify({"error": "Endpoint with that URL doesn't exist!"}), 404
+@app.errorhandler(400)
+@app.errorhandler(405)
+def error_handler(error):
+    return jsonify({"error": error.description}), error.code
 
 
 if __name__ == "__main__":
