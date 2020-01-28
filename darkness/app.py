@@ -124,7 +124,7 @@ def show_blink():
 
 
 @app.errorhandler(404)
-def not_found():
+def not_found(error):
     return jsonify({"error": "Endpoint with that URL doesn't exist!"}), 404
 
 
