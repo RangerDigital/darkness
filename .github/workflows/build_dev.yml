@@ -26,10 +26,10 @@ jobs:
       run: docker buildx build --tag rangerdigital/darkness:dev --platform linux/amd64 --output type=docker .
 
     - name: Run Darkness container for testing
-      run: docker run --name darkness --privileged -p 127.0.0.1:5000:8000 -d rangerdigital/darkness:dev
+      run: docker run --name darkness -p 127.0.0.1:5000:8000 -d rangerdigital/darkness:dev
 
-    - name: DEBUG Get logs from failing container
-      run: docker logs darkness
+    - name: DEBUG Setup Tmate session
+      uses: mxschmitt/action-tmate@v1
 
     - name: Run all the tests
       run: sleep 5; python -m pytest

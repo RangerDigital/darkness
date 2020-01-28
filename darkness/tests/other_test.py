@@ -11,4 +11,4 @@ def test_not_found(URL):
     assert response.headers["Content-Type"] == "application/json"
     assert json["error"] == "Endpoint with that URL doesn't exist!"
 
-# I need to change this file to run tests :C
+# I need to change this file to run tests
