@@ -1,6 +1,6 @@
 <p align="center">
   <br /><img
-    width="400"
+    width="600"
     src="logo.png"
     alt="Darkness – NeoPixels Controller"
   />
