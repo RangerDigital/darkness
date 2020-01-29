@@ -4,8 +4,8 @@ try:
     import requests
     import spectra
 except ImportError:
-    click.secho("Import Error!", blink=True, fg="red")
-    click.echo("Make sure you have installed all the requirements.")
+    print("Import Error!")
+    print("Make sure you have installed all the requirements.")
     exit()
 
 
