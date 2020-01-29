@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
+import os
 import time
 from functools import wraps
-
-from marshmallow import Schema, fields, ValidationError
-from marshmallow.validate import Range
 
 from flask import Flask, jsonify, request
 from leds import StripController
 
+from marshmallow import Schema, fields, ValidationError
+from marshmallow.validate import Range
+
+
+LED_COUNT = os.environ.get("PIN") or 16
+LED_GPIO = os.environ.get("PIN") or 18
+
 app = Flask(__name__)
-strip = StripController()
+strip = StripController(LED_COUNT, LED_GPIO)
 
 
 class StateSchema(Schema):
@@ -118,9 +123,10 @@ def show_blink():
     return jsonify({"msg": "Blink animation completed!"})
 
 
-@app.errorhandler(404)
 @app.errorhandler(400)
+@app.errorhandler(404)
 @app.errorhandler(405)
+@app.errorhandler(500)
 def error_handler(error):
     return jsonify({"error": error.description}), error.code
 

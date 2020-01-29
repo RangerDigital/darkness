@@ -14,17 +14,17 @@
 
 **Darkness** is a simple **Flask API** used to control **NeoPixels** strip connected to **Raspberry Pi**.
 
->Don't Use! Currently in active development!
-
 ## Setup
 
 **Darkness** is currently run as Docker container, you can try it out with commands below.
 
-This runs a container with minimal setup required (Using PWM0 as a method of control).
+This runs a container with minimal setup required.
 
 ```bash
 docker run --name darkness --cap-add SYS_RAWIO --device /dev/mem --device /dev/vcio -p 5001:8000 rangerdigital/darkness
 ```
+
+You can also specify LED count (**-e LED_COUNT=16**, Default: 16) and GPIO port (**-e LED_GPIO=18**, Default: 18).
 
 Or in case It doesn't work:
 
@@ -49,7 +49,7 @@ with **POST** or **PUT** you can update these values to control still ambient li
 "value":  1
 }
 ```
-You can control NeoPixels with these **HSV** values!
+You can also control Darkness with **darkness.py** command-line client! You can find a prototype in darkness-cli directory.
 
 ## Testing
 

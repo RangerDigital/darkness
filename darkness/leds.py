@@ -45,14 +45,14 @@ class Mock_Adafruit_NeoPixel():
 
 # TODO: Add configuration options.
 class StripController():
-    def __init__(self):
+    def __init__(self, led_count, led_gpio):
         try:
             from rpi_ws281x import Adafruit_NeoPixel
 
-            self.strip = Adafruit_NeoPixel(16, 18)
+            self.strip = Adafruit_NeoPixel(led_count, led_gpio)
             self.strip.begin()
         except:
-            self.strip = Mock_Adafruit_NeoPixel(16, 18)
+            self.strip = Mock_Adafruit_NeoPixel(led_count, led_gpio)
             self.strip.begin()
 
         self.hsv = [0, 0, 0]
@@ -71,6 +71,11 @@ class StripController():
     def set_state(self, state):
         self.hsv = [state["hue"], state["saturation"], state["value"]]
         self.status = state["status"]
+        if state["status"]:
+            self.set_color(self.hsv)
+        else:
+            # Disables leds without saving current color.
+            self.set_color([0, 0, 0], save_state=False)
 
     def set_color(self, hsv, id=None, save_state=True):
         rgb = hsv_to_rgb(hsv)

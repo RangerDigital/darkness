@@ -20,5 +20,3 @@ def test_invalid_method(URL):
     assert response.status_code == 405
     assert response.headers["Content-Type"] == "application/json"
     assert json["error"]
-
-#
