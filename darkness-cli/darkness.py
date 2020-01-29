@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-import click
-import requests
-import spectra
+try:
+    import click
+    import requests
+    import spectra
+except ImportError:
+    click.secho("Import Error!", blink=True, fg="red")
+    click.echo("Make sure you have installed all the requirements.")
+    exit()
 
 
 @click.group()
@@ -9,46 +14,76 @@ def main():
     pass
 
 
-@main.command()
-@click.argument("colour")
-@click.option('--server', default="http://127.0.0.1:5000", help="Address of Darkness container.")
+@main.command(help="Sets leds color using HEX and color names.")
+@click.argument("colour", metavar="<Colour Name>")
+@click.option("--server", default="http://127.0.0.1:5000", envvar="DARKNESS_SERVER", help="Address of running Darkness container.")
 def set(server, colour):
-    x = spectra.html(colour).to("hsv").values
+    try:
+        hsv = spectra.html(colour).to("hsv").values
+    except:
+        click.secho("Conversion Error!", blink=True, fg="red")
+        click.echo("This color couldn't be converted to HSV.")
+        return
+
     result = requests.post(
-        server + "/state", json={"hue": x[0], "saturation": x[1], "value": x[2]})
-    print("Code:", result.status_code)
+        server + "/state", json={"hue": hsv[0], "saturation": hsv[1], "value": hsv[2]})
+
+    if result.status_code == 200:
+        click.secho("Success!", fg="green")
+        click.echo("Changed color to {}. Status Code: {}".format(
+            colour, result.status_code))
+    else:
+        click.secho("Requests Error!", blink=True, fg="red")
+        click.echo("Status Code: {}".format(result.status_code))
 
 
-@main.command()
-@click.argument("red")
-@click.argument("green")
-@click.argument("blue")
-@click.option('--server', default="http://127.0.0.1:5000", help="Address of Darkness container.")
-def rgb(server, red, green, blue):
-    x = spectra.rgb(int(red) / 255, int(green) / 255, int(blue) / 255).to("hsv").values
-    print(x)
+@main.command(help="Sets leds color using RGB values.")
+@click.argument("rgb", metavar="<RGB 0-255>", nargs=3)
+@click.option("--server", default="http://127.0.0.1:5000", envvar="DARKNESS_SERVER", help="Address of running Darkness container.")
+def rgb(server, rgb):
+    hsv = spectra.rgb(int(rgb[0]) / 255, int(rgb[1]) / 255,
+                      int(rgb[2]) / 255).to("hsv").values
+
     result = requests.post(
-        server + "/state", json={"hue": x[0], "saturation": x[1], "value": x[2]})
-    print("Code:", result.status_code)
+        server + "/state", json={"hue": hsv[0], "saturation": hsv[1], "value": hsv[2]})
+
+    if result.status_code == 200:
+        click.secho("Success!", fg="green")
+        click.echo("Changed color to RGB: {}. Status Code: {}".format(
+            rgb, result.status_code))
+    else:
+        click.secho("Requests Error!", blink=True, fg="red")
+        click.echo("Status Code: {}".format(result.status_code))
 
 
-@main.command()
-@click.argument("hue")
-@click.argument("saturation")
-@click.argument("value")
-@click.option('--server', default="http://127.0.0.1:5000", help="Address of Darkness container.")
-def hsv(server, hue, saturation, value):
-    x = spectra.hsv(int(hue), int(saturation), int(value)).to("hsv").values
-    print(x)
+@main.command(help="Sets leds color using HSV values.")
+@click.argument("hsv", metavar="<HSV 0-360 or 0-1>", nargs=3)
+@click.option("--server", default="http://127.0.0.1:5000", envvar="DARKNESS_SERVER", help="Address of running Darkness container.")
+def hsv(server, hsv):
+    hsv = spectra.hsv(int(hsv[0]), int(hsv[1]), int(hsv[2])).to("hsv").values
+
     result = requests.post(
-        server + "/state", json={"hue": x[0], "saturation": x[1], "value": x[2]})
-    print("Code:", result.status_code)
+        server + "/state", json={"hue": hsv[0], "saturation": hsv[1], "value": hsv[2]})
+
+    if result.status_code == 200:
+        click.secho("Success!", fg="green")
+        click.echo("Changed color to HSV: {}. Status Code: {}".format(
+            hsv, result.status_code))
+    else:
+        click.secho("Requests Error!", blink=True, fg="red")
+        click.echo("Status Code: {}".format(result.status_code))
 
 
-@main.command()
-@click.option('--server', default="http://127.0.0.1:5000", help="Address of Darkness container.")
+@main.command(help="Gets current state of leds.")
+@click.option("--server", default="http://127.0.0.1:5000", envvar="DARKNESS_SERVER", help="Address of running Darkness container.")
 def get(server):
     result = requests.get(server + "/state")
+
+    if result.status_code != 200:
+        click.secho("Requests Error!", blink=True, fg="red")
+        click.echo("Status Code: {}".format(result.status_code))
+        return
+
     state = result.json()
 
     if state["status"]:
@@ -56,19 +91,50 @@ def get(server):
     else:
         click.echo("Status: " + click.style("OFF", fg="red"))
 
-    print("Hue: {} | Saturation: {} | Value: {}".format(
+    click.echo("Hue: {} | Saturation: {} | Value: {}".format(
         round(state["hue"], 0), round(state["saturation"], 2), round(state["value"], 2)))
 
 
-@main.command()
-@click.option('--server', default="http://127.0.0.1:5000", help="Address of Darkness container.")
+@main.command(help="Toggles leds On and Off.")
+@click.option("--server", default="http://127.0.0.1:5000", envvar="DARKNESS_SERVER", help="Address of running Darkness container.")
 def toggle(server):
-    state = requests.get(server + "/state")
-    status = state.json()["status"]
+    result = requests.get(server + "/state")
 
-    result = requests.post(
-        server + "/state", json={"status": not status})
-    print("Code:", result.status_code)
+    if result.status_code != 200:
+        click.secho("Requests Error!", blink=True, fg="red")
+        click.echo("Status Code: {}".format(result.status_code))
+        return
+
+    status = result.json()["status"]
+
+    result = requests.post(server + "/state", json={"status": not status})
+
+    if result.status_code == 200:
+        click.secho("Success!", fg="green")
+        click.echo("Changed status to: {}. Status Code: {}".format(
+            not status, result.status_code))
+    else:
+        click.secho("Requests Error!", blink=True, fg="red")
+        click.echo("Status Code: {}".format(result.status_code))
+
+
+@main.command(help="Runs specified animation.")
+@click.argument("name", metavar="<Animation Name>")
+@click.option("--server", default="http://127.0.0.1:5000", envvar="DARKNESS_SERVER", help="Address of running Darkness container.")
+@click.option("--hue", default=0, help="Hue value used by some animation.")
+@click.option("--count", default=1, help="Repeat count used by some animation.")
+@click.option("--duration", default=1, help="Duration time used by some animation.")
+def animation(server, name, hue, count, duration):
+    result = requests.post(server + "/animations/" + name,
+                           params={"duration": duration, "hue": hue, "count": count})
+
+    if result.status_code == 200:
+        click.secho("Success!", fg="green")
+        click.echo("Animation with name {} just run. Status Code: {}".format(
+            name, result.status_code))
+    else:
+        click.secho("Requests Error!", blink=True, fg="red")
+        click.echo("Status Code: {}".format(result.status_code))
 
 
 if __name__ == '__main__':
