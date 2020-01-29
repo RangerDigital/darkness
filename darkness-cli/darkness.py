@@ -34,7 +34,8 @@ def set(server, colour):
             colour, result.status_code))
     else:
         click.secho("Requests Error!", blink=True, fg="red")
-        click.echo("Status Code: {}".format(result.status_code))
+        click.echo("Status Code: {} Message: {}".format(
+            result.status_code, result.json()["error"]))
 
 
 @main.command(help="Sets leds color using RGB values.")
@@ -53,7 +54,8 @@ def rgb(server, rgb):
             rgb, result.status_code))
     else:
         click.secho("Requests Error!", blink=True, fg="red")
-        click.echo("Status Code: {}".format(result.status_code))
+        click.echo("Status Code: {} Message: {}".format(
+            result.status_code, result.json()["error"]))
 
 
 @main.command(help="Sets leds color using HSV values.")
@@ -71,7 +73,8 @@ def hsv(server, hsv):
             hsv, result.status_code))
     else:
         click.secho("Requests Error!", blink=True, fg="red")
-        click.echo("Status Code: {}".format(result.status_code))
+        click.echo("Status Code: {} Message: {}".format(
+            result.status_code, result.json()["error"]))
 
 
 @main.command(help="Gets current state of leds.")
@@ -81,7 +84,8 @@ def get(server):
 
     if result.status_code != 200:
         click.secho("Requests Error!", blink=True, fg="red")
-        click.echo("Status Code: {}".format(result.status_code))
+        click.echo("Status Code: {} Message: {}".format(
+            result.status_code, result.json()["error"]))
         return
 
     state = result.json()
@@ -102,7 +106,8 @@ def toggle(server):
 
     if result.status_code != 200:
         click.secho("Requests Error!", blink=True, fg="red")
-        click.echo("Status Code: {}".format(result.status_code))
+        click.echo("Status Code: {} Message: {}".format(
+            result.status_code, result.json()["error"]))
         return
 
     status = result.json()["status"]
@@ -115,7 +120,8 @@ def toggle(server):
             not status, result.status_code))
     else:
         click.secho("Requests Error!", blink=True, fg="red")
-        click.echo("Status Code: {}".format(result.status_code))
+        click.echo("Status Code: {} Message: {}".format(
+            result.status_code, result.json()["error"]))
 
 
 @main.command(help="Runs specified animation.")
@@ -126,7 +132,7 @@ def toggle(server):
 @click.option("--duration", default=1, help="Duration time used by some animation.")
 def animation(server, name, hue, count, duration):
     result = requests.post(server + "/animations/" + name,
-                           params={"duration": duration, "hue": hue, "count": count})
+                           params={"duration": duration, "hue": hue, "count": count}, timeout=30)
 
     if result.status_code == 200:
         click.secho("Success!", fg="green")
@@ -134,8 +140,9 @@ def animation(server, name, hue, count, duration):
             name, result.status_code))
     else:
         click.secho("Requests Error!", blink=True, fg="red")
-        click.echo("Status Code: {}".format(result.status_code))
+        click.echo("Status Code: {} Message: {}".format(
+            result.status_code, result.json()["error"]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -43,7 +43,6 @@ class Mock_Adafruit_NeoPixel():
         print("DEBUG: Strip state was updated!")
 
 
-# TODO: Add configuration options.
 class StripController():
     def __init__(self, led_count, led_gpio):
         try:
@@ -56,7 +55,7 @@ class StripController():
             self.strip.begin()
 
         self.hsv = [0, 0, 0]
-        self._status = True
+        self.status = True
         self.event_running = False
 
         # On start changes values to black.
@@ -71,6 +70,7 @@ class StripController():
     def set_state(self, state):
         self.hsv = [state["hue"], state["saturation"], state["value"]]
         self.status = state["status"]
+
         if state["status"]:
             self.set_color(self.hsv)
         else:
@@ -81,7 +81,7 @@ class StripController():
         rgb = hsv_to_rgb(hsv)
 
         # Fix blinking on leds from changing state with status = False.
-        if not self._status:
+        if not self.status:
             return
 
         if id is not None:
@@ -95,17 +95,3 @@ class StripController():
         # Saves color as currently displayed.
         if save_state:
             self.hsv = hsv
-
-    @property
-    def status(self):
-        return self._status
-
-    @status.setter
-    def status(self, status):
-        if status:
-            self.set_color(self.hsv)
-        else:
-            # Disables leds without saving current color.
-            self.set_color([0, 0, 0], save_state=False)
-
-        self._status = status
