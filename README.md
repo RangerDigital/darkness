@@ -49,7 +49,7 @@ with **POST** or **PUT** you can update these values to control still ambient li
 "value":  1
 }
 ```
-You can control NeoPixels with these **HSV** values!
+You can also control Darkness with **darkness.py** command-line client! You can find a prototype in darkness-cli directory.
 
 ## Testing
 
