@@ -71,6 +71,11 @@ class StripController():
     def set_state(self, state):
         self.hsv = [state["hue"], state["saturation"], state["value"]]
         self.status = state["status"]
+        if state["status"]:
+            self.set_color(self.hsv)
+        else:
+            # Disables leds without saving current color.
+            self.set_color([0, 0, 0], save_state=False)
 
     def set_color(self, hsv, id=None, save_state=True):
         rgb = hsv_to_rgb(hsv)
