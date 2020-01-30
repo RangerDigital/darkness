@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Vuepress
+docs/node_modules/
+docs/dist/
+docs/package-lock.json
+npm-debug.log
+yarn-error.log

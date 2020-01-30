@@ -27,7 +27,7 @@ class StateSchema(Schema):
 class AnimationParamsSchema(Schema):
     hue = fields.Int(missing=360, validate=Range(min=0, max=360))
     count = fields.Int(missing=1, validate=Range(min=1, max=60))
-    duration = fields.Int(missing=1, validate=Range(min=1, max=60))
+    duration = fields.Int(missing=1, validate=Range(min=1, max=30))
 
 
 @app.route("/state", methods=["GET"])

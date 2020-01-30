@@ -1,0 +1,37 @@
+name: Build - Documentation
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - "docs/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Build Vuepress documentation
+      run: |
+        cd docs/
+        npm install
+        vuepress build
+      env:
+        CI: true
+
+    - name: Deploy to Netlify
+      uses: netlify/actions/cli@master
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.STAGING_NETLIFY_SITE_ID }}
+      with:
+        args: deploy --dir=dist --prod
+        secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
