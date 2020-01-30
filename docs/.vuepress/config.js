@@ -5,7 +5,6 @@ module.exports = {
       logo: '/logo.png',
 
       head: [
-        ['link', { rel: "icon", type: "image/png", href: "/favicon.png"}],
         ['meta', { name: "theme-color", content: "#f9d32d"}],
       ],
 
