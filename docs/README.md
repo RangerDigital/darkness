@@ -4,11 +4,11 @@ heroImage: https://github.com/RangerDigital/darkness/raw/master/logo.png
 actionText: Get Started
 actionLink: /guide/
 features:
-- title: 🧵 Simplicity First
+- title: Simplicity First
   details: The simplest setup with maximum flexibility.
-- title: 🚚 Docker Powered
+- title: Docker Powered
   details: Enjoy the Darkness with simple Docker command.
-- title: 💻 Command-line Client
+- title: Command-line Client
   details: It all begins at the command line.
 footer: GPL-3.0 Licensed | Copyright © 2020
 ---
@@ -31,12 +31,17 @@ footer: GPL-3.0 Licensed | Copyright © 2020
 
 <img style="display: block; margin-left: auto; margin-right: auto;" class="center" src="terminal.gif" width=750/>
 
+**To install darkness.py CLI client simply run this command below:**
+```bash
+curl https://darkness.bednarski.dev/install.sh | sudo bash
+```
+
 ## 🔥 Quick Start
 ### Prerequisites
 **Things you will need to get started:**
-- **Raspberry Pi**
-- **Docker Engine installed on Raspberry.**
-- **NeoPixels (Ws281x) LEDs connected to (Defaults uses GPIO 18) on Raspberry.**
+- Raspberry Pi
+- Docker Engine installed on Raspberry.
+- NeoPixels (Ws281x) LEDs connected to (Defaults uses GPIO 18) your Raspberry.
 
 ### Setup
 **To run the Darkness, create Docker container with this command:**
