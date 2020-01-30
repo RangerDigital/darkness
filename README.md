@@ -8,6 +8,7 @@
 
 ***
 
+![Build - Documentation](https://github.com/RangerDigital/darkness/workflows/Build%20-%20Documentation/badge.svg?branch=master)
 ![Build - Dev](https://github.com/RangerDigital/darkness/workflows/Build%20-%20Dev/badge.svg?branch=dev)
 ![Build - Production](https://github.com/RangerDigital/darkness/workflows/Build%20-%20Production/badge.svg?branch=master)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
