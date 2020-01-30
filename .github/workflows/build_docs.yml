@@ -24,7 +24,7 @@ jobs:
         cd docs/
         npm install -g vuepress
         vuepress build
-        mv -R dist/* ../dist
+        cp -R dist/* ../dist
       env:
         CI: true
 
