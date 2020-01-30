@@ -24,6 +24,7 @@ jobs:
         cd docs/
         npm install -g vuepress
         vuepress build
+        mv -R dist/* ../dist
       env:
         CI: true
 
@@ -33,5 +34,4 @@ jobs:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.STAGING_NETLIFY_SITE_ID }}
       with:
-        args: deploy --dir=docs/dist --prod
-        secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
+        args: deploy --dir=dist --prod
