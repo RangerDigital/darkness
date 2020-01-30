@@ -24,8 +24,6 @@ jobs:
         cd docs/
         npm install -g vuepress
         vuepress build
-        mkdir ../dist
-        cp -R .vuepress/dist/* ../dist
       env:
         CI: true
 
@@ -33,6 +31,6 @@ jobs:
       uses: netlify/actions/cli@master
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        NETLIFY_SITE_ID: ${{ secrets.STAGING_NETLIFY_SITE_ID }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
       with:
-        args: deploy --dir=dist --prod
+        args: deploy --dir=docs/.vuepress/dist --prod
