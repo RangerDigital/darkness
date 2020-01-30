@@ -22,7 +22,7 @@ jobs:
     - name: Build Vuepress documentation
       run: |
         cd docs/
-        npm install
+        npm install -g vuepress
         vuepress build
       env:
         CI: true
