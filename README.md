@@ -85,4 +85,4 @@ Just fork this project from the `master` branch and submit a Pull Request (PR) t
 If you are modifying the Darkness server you should also run `pytest` functional tests inside `/darkness/tests` directory.
 
 ## 📃 License
-This project is licenced under [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/) .
+This project is licensed under [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/) .
