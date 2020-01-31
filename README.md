@@ -21,7 +21,7 @@
 
 
 ## 🍬 Features
-The most noticeable feature currently implemented in Darkness:
+The most noticeable features currently implemented in Darkness:
 - **Run as a Docker container**, simple to get started.
 - **Python API**, lightweight Flask powered API.
 - **Animation System,** flexible way to show notifications.
@@ -81,7 +81,7 @@ If you want to see the rainbow animation just **POST** or **PUT** to `/animation
 }
 ```
 You can specify duration of the animation with **URL parameters**,
-for example: `/animations/rainbow?duration=10` with play rainbow animation for 10 seconds.
+for example: `/animations/rainbow?duration=10` will play rainbow animation for 10 seconds.
 
 >💡 For full API documentation go to [Darkness](https://darkness.bednarski.dev/) official site!
 
