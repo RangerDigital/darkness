@@ -17,6 +17,9 @@
 
 > 📚 For more information go to [Darkness](https://darkness.bednarski.dev/) official site!
 
+<br>
+
+
 ## 🍬 Features
 The most noticeable feature currently implemented in Darkness:
 - **Run as a Docker container**, simple to get started.
@@ -24,8 +27,10 @@ The most noticeable feature currently implemented in Darkness:
 - **Animation System,** flexible way to show notifications.
 - **Command Line client**, by using Darkness CLI you can integrate anything.
 
-## 🔥 Setup
+<br>
 
+
+## 🔥 Setup
 **Darkness** is run as a Docker container, you can try it out with commands below.
 
 This runs a container with minimal setup required:
@@ -44,17 +49,20 @@ docker run --name darkness --privileged -p 5000:8000 rangerdigital/darkness
 
 >🔪 The privileged flag is seriously **insecure**, I wouldn't trust me if I were you!
 
-## 🎉 Usage
+<br>
 
+
+## 🎉 Usage
 You can use **Darkness CLI** client control Darkness running on your Raspberry Pi by installing it with the command below:
 ```bash
 curl https://darkness.bednarski.dev/install.sh | sudo bash
 ```
+
 <p align="center">
 	<img src="docs\.vuepress\public\terminal.gif" alt="Darkness CLI Terminal" width=750/>
 </p>
 
-Currently supports **only Linux** distributions, or If you want to have full control use **Darkness API** to its fullest:
+Currently supports **only Linux** distributions, or If you want to have full control use **Darkness API**.
 
 The easiest way to start is to run **GET** requests against `/state` endpoint,
 with **POST** or **PUT** you can update these values to control still ambient light.
@@ -73,9 +81,11 @@ If you want to see the rainbow animation just **POST** or **PUT** to `/animation
 }
 ```
 You can specify duration of the animation with **URL parameters**,
- for example: `/animations/rainbow?duration=10` with play rainbow animation for 10 seconds.
+for example: `/animations/rainbow?duration=10` with play rainbow animation for 10 seconds.
 
 >💡 For full API documentation go to [Darkness](https://darkness.bednarski.dev/) official site!
+
+<br>
 
 ## 🚧 Contributing
 
@@ -83,6 +93,8 @@ You can specify duration of the animation with **URL parameters**,
 
 Just fork this project from the `master` branch and submit a Pull Request (PR) to the `dev` branch.
 If you are modifying the Darkness server you should also run `pytest` functional tests inside `/darkness/tests` directory.
+
+<br>
 
 ## 📃 License
 This project is licensed under [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/) .
