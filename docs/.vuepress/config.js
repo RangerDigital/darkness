@@ -3,6 +3,7 @@ module.exports = {
    description: 'The fastest way to get started with NeoPixels!',
    themeConfig: {
       logo: '/logo.png',
+      smoothScroll: true,
 
       head: [
         ['meta', { name: "theme-color", content: "#f9d32d"}],

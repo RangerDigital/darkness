@@ -9,12 +9,19 @@ features:
 - title: Docker Powered
   details: Enjoy the Darkness with simple Docker command.
 - title: Command-line Client
-  details: It all begins at the command line.
-footer: GPL-3.0 Licensed | Copyright © 2020
+  details: It all begins at the command-line.
+footer: GPL-3.0 Licensed | Copyright © Jakub Bednarski 2020
 ---
 
+<p align="center">
+  <b>Darkness</b> is a simple dockerized <b>API</b> used to control <b>NeoPixels</b> strips connected to <b>Raspberry Pi</b>.
+</p>
+
+<br>
+
 ## 🚀 Use Cases
-**Typical use cases I needed for myself:**
+My typical use cases for The Darkness:
+
 - **Alert notifications from Grafana,**
   I wanted to have visual feedback about my infrastructure.
 - **Automation visual feedback,**
@@ -22,42 +29,53 @@ footer: GPL-3.0 Licensed | Copyright © 2020
 - **Ambient lighting,**
   because routers with RGB lighting are 🔥.
 
+<br>
+
 ## 🍬 Features
-**The most noticeable feature implemented in Darkness:**
-- **Run as a Docker container**, simple to get started.
-- **Python API**, lightweight Flask powered API.
+The most noticeable features currently implemented in Darkness:
+
+- **Run as a Docker container,** simple to get started.
+- **Python API,** lightweight Flask powered API.
 - **Animation System,** flexible way to show notifications.
-- **Command Line client**, by using darkness.py you can integrate anything.
+- **Command-line Client,** by using Darkness CLI you can integrate anything.
 
-<img style="display: block; margin-left: auto; margin-right: auto;" class="center" src="terminal.gif" width=750/>
+<br>
 
-**To install darkness.py CLI client simply run this command below:**
+## 🔥 Setup
+**Darkness** is run as a Docker container, you can try it out with commands below.
+This runs a container with minimal setup required:
+
+```bash
+docker run --name darkness --cap-add SYS_RAWIO --device /dev/mem --device /dev/vcio -p 5000:8000 rangerdigital/darkness
+```
+
+>🔨 You can specify LED count `-e LED_COUNT=16`, (Default: 16) and GPIO port `-e LED_GPIO=18`, Default: 18).
+
+Or in case It doesn't work:
+
+```bash
+docker run --name darkness --privileged -p 5000:8000 rangerdigital/darkness
+```
+
+>🔪 The privileged flag is seriously **insecure**, I wouldn't trust me if I were you!
+
+<br>
+
+
+## 🎉 Usage
+You can use **Darkness CLI** client control Darkness running on your Raspberry Pi by installing it with the command below:
 ```bash
 curl https://darkness.bednarski.dev/install.sh | sudo bash
 ```
 
-## 🔥 Quick Start
-### Prerequisites
-**Things you will need to get started:**
-- Raspberry Pi
-- Docker Engine installed on Raspberry.
-- NeoPixels (Ws281x) LEDs connected to (Defaults uses GPIO 18) your Raspberry.
+<p align="center">
+  <img src="terminal.gif" alt="Darkness CLI Terminal" width=750/>
+</p>
 
-### Setup
-**To run the Darkness, create Docker container with this command:**
-```bash
-docker run --name darkness --cap-add SYS_RAWIO --device /dev/mem --device /dev/vcio -p 5000:8000 rangerdigital/darkness
-```
-This will run an API server on port **5000** on your Raspberry.
+Currently supports **only Linux** distributions, or If you want to have full control use **Darkness API**.
 
-### Usage
-**There are multiple ways to interact with the Darkness.**
-
-::: warning Warning!
-Darkness is currently in the development stage so the whole documentation is incomplete.
-:::
-
-But for now, the easiest way to try it out is to run **GET** requests against **/state** endpoint, with **POST** or **PUT** you can update these values to control still ambient light.
+The easiest way to start is to run **GET** requests against `/state` endpoint,
+with **POST** or **PUT** you can update these values to control still ambient light.
 ```json
 {
 "hue":  360,
@@ -66,4 +84,16 @@ But for now, the easiest way to try it out is to run **GET** requests against **
 "value":  1
 }
 ```
-You can also control Darkness with **darkness.py** command-line client! You can find a prototype in darkness-cli directory on GitHub.
+If you want to see the rainbow animation just **POST** or **PUT** to `/animations/rainbow`.
+```json
+{
+"msg":  "Rainbow animation completed!"
+}
+```
+You can specify duration of the animation with **URL parameters**,
+for example: `/animations/rainbow?duration=10` will play rainbow animation for 10 seconds.
+
+<br>
+
+## 📃 License
+This project is licensed under [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/) .
