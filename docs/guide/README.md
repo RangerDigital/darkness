@@ -4,9 +4,9 @@ sidebar: auto
 # Guide
 
 ## 📑 Introduction
-I wanted to build **Darkness** for controlling **NeoPixels** ring under my **Raspberry Pi 3B+** router. Because It sits on my desk I could use It as a **visual notification system**.
+I wanted to build Darkness for controlling NeoPixels ring under my Raspberry Pi 3B+ router. Because It sits on my desk I could use It as a visual notification system.
 
-**Darkness** consists of **Docker** container running **Python API** server and optional **command-line client** that you can use to easily integrate with your other automation systems.
+Darkness consists of **Docker** container running **Python API** server and optional **command-line client** that you can use to easily integrate with your other automation systems.
 
 ::: tip 💡 Tip!
 The whole thing was built to be as easy as possible to deploy and use so don't expect all the bells and whistles... yet!
@@ -15,16 +15,16 @@ The whole thing was built to be as easy as possible to deploy and use so don't e
 <br>
 
 ## 🔥 Installation
-Installation of Darkness is a **simple process**, provided you have all the necessary **prerequisites**.
+Installation of Darkness is a simple process, provided you have all the necessary prerequisites.
 
 ### Prerequisites
 For the **hardware** side of things:
 
 - Raspberry Pi 2/3/3B/3B+
-- NeoPixels (WS281X LEDs) strip or ring connected to your Raspberry's GPIO 18 pin.
+- NeoPixels (WS281X LEDs) strip or ring connected to your Raspberry's **GPIO 18** pin.
 
 ::: tip 💡 Tip!
-Darkness uses a Python port of [rpi_ws281x](https://github.com/jgarff/rpi_ws281x) library! Check it out for more advanced stuff.
+Darkness uses a Python port of [rpi_ws281x](https://github.com/jgarff/rpi_ws281x) library! Check it out for more information.
 :::
 
 And finally for the **software** requirements:
@@ -34,7 +34,7 @@ And finally for the **software** requirements:
 <br>
 
 ### Darkness Controller
-**Darkness** is run as a **Docker** container, you can deploy it out with commands below.
+Darkness is run as a **Docker** container, you can deploy it out with commands below.
 
 This runs a container with **minimal permissions** required:
 
@@ -60,7 +60,7 @@ You can use `-e` flag to **configure** Darkness. Available environment variables
 <br>
 
 ### Darkness CLI
-If you are running **Linux** *(Tested on Ubuntu, Debian, Manjaro)* you can use dedicated **Darkness CLI** client. Install by simply running this command below:
+If you are running **Linux** *(Tested on Ubuntu, Debian, Manjaro)* you can use dedicated Darkness CLI client. Install by simply running this command below:
 
 ```bash
 curl https://darkness.bednarski.dev/install.sh | sudo bash
@@ -75,7 +75,7 @@ If you don't trust piping directly into the bash then save and check this script
 <br>
 
 ## 🎉 Usage
-If you are using **Darkness CLI** client you should specify **URL** to your controller with:
+If you are using Darkness CLI client you should specify **URL** to your controller with:
 
 - Using `--server http://127.0.0.1:5000` command option.
 - Using `DARKNESS_URL` environment variable that will save this setting.
