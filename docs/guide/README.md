@@ -78,7 +78,7 @@ If you don't trust piping directly into the bash then save and check this script
 If you are using Darkness CLI client you should specify **URL** to your controller with:
 
 - Using `--server http://127.0.0.1:5000` command option.
-- Using `DARKNESS_URL` environment variable that will save this setting.
+- Using `DARKNESS_SERVER` environment variable that will save this setting.
 
 *(This **defaults** to `localhost`)*
 
